@@ -1,0 +1,220 @@
+Enum OrderType {
+  dine_in
+  takeaway
+  delivery
+}
+
+Table Locations {
+	location_id serial [primary key, unique, increment]
+	name varchar(100) [not null]
+  address varchar(255) [not null]
+	city varchar(100) [not null]
+	phone varchar(50)
+	opening_hours varchar(255)
+}
+
+Table Staff {
+	staff_id serial [primary key, not null, unique, increment]
+	location_id int [not null]
+	first_name varchar(100) [not null]
+	last_name varchar(100) [not null]
+	role varchar(50) [not null]
+	phone varchar(50)
+	email varchar(100)
+	hire_date date
+	is_active boolean [default: true]
+}
+
+Table MenuCategories {
+	menu_category_id serial [primary key, not null, unique, increment]
+	name varchar(100) [not null]
+	description varchar(255)
+	sort_order int
+}
+
+Table MenuItems {
+	menu_item_id serial [primary key, unique, increment]
+	menu_category_id int [not null]
+	name varchar(150) [not null]
+	description text
+	price decimal(10,2) [not null]
+  preparation_time_minutes int
+  cost decimal(10,2)
+  is_active boolean [default: true]
+}
+
+Table Customers {
+	customer_id serial [primary key, unique, increment]
+	name varchar(150) [not null]
+	phone varchar(50)
+	email varchar(100)
+	address varchar(255)
+}
+
+Table Orders {
+	order_id serial [primary key, unique, increment]
+	customer_id int [not null]
+  location_id int [not null]
+	order_type OrderType [not null]
+	order_status varchar(20) [not null]
+	table_id int
+	created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+	completed_at timestamp [null]
+	total_amount decimal(10,2) [not null, default: 0]
+}
+
+Table OrderItems {
+	order_item_id serial [primary key, unique, increment]
+	order_id int [not null]
+	menu_item_id int [not null]
+	quantity int [not null]
+	unit_price decimal(10,2) [not null]
+	notes varchar(255) [null]
+}
+
+Table Tables {
+	table_id serial [primary key, unique, increment]
+	location_id int [not null]
+	seats int [default: 1]
+	is_booked boolean [default: false]
+	table_number varchar(20) [not null]
+}
+
+Table Inventory {
+	inventory_id serial [primary key, unique, increment]
+	location_id int [not null]
+  ingredient_id int [not null]
+	ingredient_name varchar(150) [null]
+	quantity_on_hand decimal(10,2) [not null]
+	unit varchar(20) [null]
+  reorder_level decimal(10,2)
+  last_updated timestamp
+}
+
+Table ShiftSchedules {
+	shift_id serial [primary key, unique, increment]
+	staff_id int [not null]
+	location_id int [not null]
+  shift_date date [not null]
+  start_time time [not null]
+  end_time time [not null]
+  role_at_shift varchar(50) [null]
+  is_recurring boolean
+  recurrence_rule varchar(255) [null]
+  notes text [null]
+}
+
+Table Ingredients {
+  ingredient_id serial [primary key, unique, increment]
+  name varchar(255) [not null]
+  unit varchar(255) [not null]
+  default_cost_per_unit decimal(10,2)
+}
+
+Table MenuItemIngredients {
+  menu_item_id int [not null]
+  ingredient_id int [not null]
+  quantity_per_item decimal(10,2)
+  indexes {
+    (menu_item_id, ingredient_id) [pk]
+  }
+}
+
+Table Suppliers {
+  supplier_id int [primary key, unique, increment]
+  supplier_name varchar(255) [not null]
+  contact_name varchar(255)
+  phone varchar(50)
+  email varchar(100)
+  address varchar(255)
+  notes text [null]
+}
+
+Table IngredientSuppliers {
+  ingredient_id int [not null]
+  supplier_id int [not null]
+  supplier_sku varchar(255) [null]
+  cost_per_unit decimal(10,2)
+  indexes {
+    (ingredient_id, supplier_id) [pk]
+  }
+}
+
+Table InventoryTransactions {
+  transaction_id serial [primary key, unique, increment]
+  location_id int [not null]
+  ingredient_id int [not null]
+  related_order_id int [null]
+  quantity_change decimal(10,2) [not null]
+  reason varchar(255) [not null]
+  created_at timestamp [not null]
+}
+
+Table Reservations {
+  reservation_id serial [pk, unique, increment]
+  table_id int
+  location_id int [not null]
+  customer_id int [not null]
+  party_size int [not null]
+  status varchar(255) [not null]
+  notes text [null]
+  reservation_datetime timestamp [not null]
+}
+
+Table CustomerFeedback {
+  feedback_id serial [pk, unique, increment]
+  customer_id int [null]
+  order_id int [null]
+  rating int [not null]
+  comment text
+  created_at timestamp [not null]
+}
+
+
+Ref: Locations.location_id < Staff.location_id
+
+Ref: MenuCategories.menu_category_id < MenuItems.menu_category_id
+
+Ref: Locations.location_id < Orders.location_id
+
+Ref: Customers.customer_id < Orders.customer_id
+
+Ref: Orders.table_id > Tables.table_id
+
+Ref: Orders.order_id < OrderItems.order_id
+
+Ref: MenuItems.menu_item_id < OrderItems.menu_item_id
+
+Ref: Locations.location_id < Inventory.location_id
+
+Ref: Ingredients.ingredient_id < Inventory.ingredient_id
+
+Ref: Staff.staff_id < ShiftSchedules.staff_id
+
+Ref: Locations.location_id < ShiftSchedules.location_id
+
+Ref: Locations.location_id < Tables.location_id
+
+Ref: MenuItems.menu_item_id < MenuItemIngredients.menu_item_id
+
+Ref: Ingredients.ingredient_id < MenuItemIngredients.ingredient_id
+
+Ref: Ingredients.ingredient_id < IngredientSuppliers.ingredient_id
+
+Ref: Suppliers.supplier_id < IngredientSuppliers.supplier_id
+
+Ref: Customers.customer_id  < CustomerFeedback.customer_id
+
+Ref: Orders.order_id < CustomerFeedback.order_id
+
+Ref: Locations.location_id < Reservations.location_id
+
+Ref: Customers.customer_id < Reservations.customer_id
+
+Ref: Tables.table_id < Reservations.table_id
+
+Ref: Locations.location_id < InventoryTransactions.location_id
+
+Ref: Ingredients.ingredient_id < InventoryTransactions.ingredient_id
+
+Ref: Orders.order_id < InventoryTransactions.related_order_id
