@@ -22,11 +22,11 @@ You can use **diagrams.net (draw.io)**:
 
 ## 🧑‍💻 Author
 
-Created by **Василь**  
+Created by **Василь Гайда**  
 GitHub: [Vasia1101](https://github.com/Vasia1101)
 
 ---
 
 ## ⚙️ License
 
-MIT License (optional — or remove this block)
+MIT License
