@@ -4,6 +4,37 @@ Enum OrderType {
   delivery
 }
 
+Enum OrderStatus {
+  new
+  in_progress
+  completed
+  cancelled
+}
+
+Enum ReservationStatus {
+  pending
+  confirmed
+  cancelled
+  no_show
+}
+
+Enum StaffRole {
+  manager
+  server
+  cook
+  bartender
+  host
+  cleaner
+  other
+}
+
+Enum InventoryTransactionReason {
+  purchase
+  order_usage
+  waste
+  adjustment
+}
+
 Table Locations {
 	location_id serial [primary key, unique, increment]
 	name varchar(100) [not null]
@@ -18,7 +49,7 @@ Table Staff {
 	location_id int [not null]
 	first_name varchar(100) [not null]
 	last_name varchar(100) [not null]
-	role varchar(50) [not null]
+	role StaffRole [not null]
 	phone varchar(50)
 	email varchar(100)
 	hire_date date
@@ -56,7 +87,7 @@ Table Orders {
 	customer_id int [not null]
   location_id int [not null]
 	order_type OrderType [not null]
-	order_status varchar(20) [not null]
+	order_status OrderStatus [not null]
 	table_id int
 	created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
 	completed_at timestamp [null]
@@ -86,7 +117,7 @@ Table Inventory {
   ingredient_id int [not null]
 	ingredient_name varchar(150) [null]
 	quantity_on_hand decimal(10,2) [not null]
-	unit varchar(20) [null]
+	unit varchar(50) [not null]
   reorder_level decimal(10,2)
   last_updated timestamp
 }
@@ -98,7 +129,7 @@ Table ShiftSchedules {
   shift_date date [not null]
   start_time time [not null]
   end_time time [not null]
-  role_at_shift varchar(50) [null]
+  role_at_shift StaffRole [null]
   is_recurring boolean
   recurrence_rule varchar(255) [null]
   notes text [null]
@@ -107,7 +138,7 @@ Table ShiftSchedules {
 Table Ingredients {
   ingredient_id serial [primary key, unique, increment]
   name varchar(255) [not null]
-  unit varchar(255) [not null]
+  unit varchar(50) [not null]
   default_cost_per_unit decimal(10,2)
 }
 
@@ -121,7 +152,7 @@ Table MenuItemIngredients {
 }
 
 Table Suppliers {
-  supplier_id int [primary key, unique, increment]
+  supplier_id serial [primary key, unique, increment]
   supplier_name varchar(255) [not null]
   contact_name varchar(255)
   phone varchar(50)
@@ -146,7 +177,7 @@ Table InventoryTransactions {
   ingredient_id int [not null]
   related_order_id int [null]
   quantity_change decimal(10,2) [not null]
-  reason varchar(255) [not null]
+  reason InventoryTransactionReason [not null]
   created_at timestamp [not null]
 }
 
@@ -156,7 +187,7 @@ Table Reservations {
   location_id int [not null]
   customer_id int [not null]
   party_size int [not null]
-  status varchar(255) [not null]
+  status ReservationStatus [not null]
   notes text [null]
   reservation_datetime timestamp [not null]
 }
@@ -166,7 +197,7 @@ Table CustomerFeedback {
   customer_id int [null]
   order_id int [null]
   rating int [not null]
-  comment text
+  comment text [null]
   created_at timestamp [not null]
 }
 
