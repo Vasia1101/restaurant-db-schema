@@ -39,7 +39,6 @@ The project was designed for educational purposes and demonstrates real-world re
 |------|-------------|
 | `restaurant.dbml` | Main DBML schema (ERD source code) |
 | `erd.png` | Exported ER diagram image for GitHub preview |
-| `erd.drawio` | Source file for editing the ER diagram in diagrams.net |
 
 ---
 
